@@ -1,86 +1,172 @@
-import org.polyfrost.gradle.util.noServerRunConfigs
-
 plugins {
-	id(libs.plugins.pgt.main.get().pluginId)
-	id(libs.plugins.pgt.defaults.repo.get().pluginId)
-	id(libs.plugins.pgt.defaults.loom.get().pluginId)
-	id(libs.plugins.pgt.defaults.java.get().pluginId)
-	alias(libs.plugins.blossom)
-	id(libs.plugins.shadow.get().pluginId)
-	alias(libs.plugins.kotlin) apply false
+	id("dev.architectury.loom") version "1.7.+"
 }
 
-version = project.properties["mod_version"] as String
-group = project.properties["maven_group"] as String
+class ModData {
+	val id = property("mod.id").toString()
+	val name = property("mod.name")
+	val version = property("mod.version")
+	val group = property("mod.group").toString()
+	val description = property("mod.description")
+	val source = property("mod.source")
+	val issues = property("mod.issues")
+	val license = property("mod.license").toString()
+	val modrinth = property("mod.modrinth")
+	val curseforge = property("mod.curseforge")
+	val kofi = property("mod.kofi")
+	val discord = property("mod.discord")
+}
+
+class Dependencies {
+	val modmenuVersion = property("deps.modmenu_version")
+	val yaclVersion = property("deps.yacl_version")
+	val devauthVersion = property("deps.devauth_version")
+}
+
+class LoaderData {
+	val loader = loom.platform.get().name.lowercase()
+	val isFabric = loader == "fabric"
+	val isNeoforge = loader == "neoforge"
+}
+
+class McData {
+	val version = property("mod.mc_version")
+	val dep = property("mod.mc_dep")
+	val targets = property("mod.mc_targets").toString().split(", ")
+}
+
+val mc = McData()
+val mod = ModData()
+val deps = Dependencies()
+val loader = LoaderData()
+
+version = "${mod.version}+${mc.version}-${loader.loader}"
+group = mod.group
+base { archivesName.set(mod.id) }
+
+stonecutter.const("fabric", loader.isFabric)
+stonecutter.const("neoforge", loader.isNeoforge)
+
+loom {
+	silentMojangMappingsLicense()
+
+	runConfigs.remove(runConfigs["server"])
+
+	runConfigs.all {
+		ideConfigGenerated(stonecutter.current.isActive)
+		runDir = "../../run"
+	}
+}
 
 repositories {
-	mavenCentral()
-	maven("https://repo.polyfrost.org/releases")
-	maven("https://maven.isxander.dev/releases")
-	maven("https://maven.terraformersmc.com/releases")
+	maven("https://maven.parchmentmc.org") // Parchment
+	maven("https://maven.isxander.dev/releases") // YACL
+	maven("https://thedarkcolour.github.io/KotlinForForge") // Kotlin for Forge - required by YACL
+	maven("https://maven.terraformersmc.com") // Mod Menu
+	maven("https://maven.neoforged.net/releases") // NeoForge
+	maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
+}
+
+dependencies {
+	minecraft("com.mojang:minecraft:${mc.version}")
+
+	@Suppress("UnstableApiUsage")
+	mappings(loom.layered {
+		// Mojmap mappings
+		officialMojangMappings()
+
+		// Parchment mappings (it adds parameter mappings & javadoc)
+		optionalProp("deps.parchment_version") {
+			parchment("org.parchmentmc.data:parchment-${property("mod.mc_version")}:$it@zip")
+		}
+	})
+
+	if (loader.isFabric) {
+		modImplementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
+
+		// YACL
+		modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${mc.version}-${loader.loader}")
+
+		// Mod Menu
+		modImplementation("com.terraformersmc:modmenu:${deps.modmenuVersion}")
+
+		// DevAuth
+		modRuntimeOnly("me.djtheredstoner:DevAuth-${loader.loader}:${deps.devauthVersion}")
+	} else if (loader.isNeoforge) {
+		"neoForge"("net.neoforged:neoforge:${findProperty("deps.neoforge")}")
+
+		// YACL
+		implementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${mc.version}-${loader.loader}") {isTransitive = false}
+
+		// DevAuth
+		modRuntimeOnly("me.djtheredstoner:DevAuth-${loader.loader}:${deps.devauthVersion}")
+	}
 }
 
 java {
-	toolchain {
-		when(platform.mcVersion) {
-			in 12001..12004 -> {
-				languageVersion.set(JavaLanguageVersion.of(17))
-			}
-			else -> {
-				languageVersion.set(JavaLanguageVersion.of(21))
-			}
+	val java = if (stonecutter.compare(
+			stonecutter.current.version,
+			"1.20.6"
+		) >= 0
+	) JavaVersion.VERSION_21 else JavaVersion.VERSION_17
+	sourceCompatibility = java
+	targetCompatibility = java
+}
+
+tasks.processResources {
+	val props = buildMap {
+		put("id", mod.id)
+		put("name", mod.name)
+		put("version", mod.version)
+		put("mcdep", mc.dep)
+		put("description", mod.description)
+		put("source", mod.source)
+		put("issues", mod.issues)
+		put("license", mod.license)
+		put("modrinth", mod.modrinth)
+		put("curseforge", mod.curseforge)
+		put("kofi", mod.kofi)
+		put("discord", mod.discord)
+		put("modmenu_version", deps.modmenuVersion)
+		put("yacl_version", deps.yaclVersion)
+
+		if (loader.isNeoforge) {
+			put("forgeConstraint", findProperty("modstoml.forge_constraint"))
+		}
+		if (mc.version == "1.20.1" || mc.version == "1.20.4") {
+			put("forge_id", loader.loader)
+		}
+	}
+
+	props.forEach(inputs::property)
+
+	if (loader.isFabric) {
+		filesMatching("fabric.mod.json") { expand(props) }
+		exclude(listOf("META-INF/mods.toml", "META-INF/neoforge.mods.toml"))
+	}
+
+	if (loader.isNeoforge) {
+		if (mc.version == "1.20.4") {
+			filesMatching("META-INF/mods.toml") { expand(props) }
+			exclude("fabric.mod.json", "META-INF/neoforge.mods.toml")
+		} else {
+			filesMatching("META-INF/neoforge.mods.toml") { expand(props) }
+			exclude("fabric.mod.json", "META-INF/mods.toml")
 		}
 	}
 }
 
-loom {
-	noServerRunConfigs()
-}
-
-dependencies {
-	val modMenuVersion = when(platform.mcVersion) {
-		12001 -> "7.2.2"
-		12004 -> "9.2.0-beta.2"
-		12006 -> "10.0.0-beta.1"
-		else -> "11.0.0-beta.1"
-	}
-
-	val fabricApiVersion = when(platform.mcVersion) {
-		12001 -> "0.92.1"
-		12004 -> "0.97.0"
-		12006 -> "0.98.0"
-		else -> "0.100.1"
-	}
-
-	val yaclVersion = when(platform.mcVersion) {
-		12001 -> "3.4.2+1.20.1-fabric"
-		12004 -> "3.4.2+1.20.4-fabric"
-		12006 -> "3.4.2+1.20.5-fabric"
-		else -> "3.5.0+1.21-fabric"
-	}
-
-	modImplementation("com.terraformersmc:modmenu:${modMenuVersion}")
-	modImplementation("net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}+${platform.mcVersionStr}")
-	modImplementation("dev.isxander:yet-another-config-lib:${yaclVersion}")
-
-	// DevAuth. Lets us log in with our own Minecraft account. Useful for testing tab features.
-	modRuntimeOnly("me.djtheredstoner:DevAuth-${platform.loaderStr}:1.2.0")
-}
-
-tasks.processResources {
-	filesMatching("fabric.mod.json") {
-		expand(mapOf("version" to project.version))
+if (stonecutter.current.isActive) {
+	rootProject.tasks.register("buildActive") {
+		group = "project"
+		dependsOn(tasks.named("build"))
 	}
 }
 
-tasks.jar {
-	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName.get()}" }
-	}
-}
+@Suppress("TYPE_MISMATCH", "UNRESOLVED_REFERENCE")
+fun <T> optionalProp(property: String, block: (String) -> T?): T? =
+	findProperty(property)?.toString()?.takeUnless { it.isBlank() }?.let(block)
 
-configurations.all {
-	resolutionStrategy {
-		force("net.fabricmc:fabric-loader:0.15.11")
-	}
+fun isPropDefined(property: String): Boolean {
+	return property(property)?.toString()?.isNotBlank() ?: false
 }

@@ -6,6 +6,7 @@
   "dropped-item-tweaks.dropped-stack-item-count.description": "The max amount of dropped items to render. This does not scale like vanilla. Set to 0 to disable.",
   "dropped-item-tweaks.item-scale": "Item Scale",
   "dropped-item-tweaks.item-scale.description": "The scale of dropped items.",
-  "dropped-item-tweaks.uhc-overlay": "UHC Overlay",
-  "dropped-item-tweaks.uhc-overlay.description": "Custom scale for apples, gapples, gold, golden nuggets, and player heads.\n\nSet to 0 to disable!"
+  "dropped-item-tweaks.custom-item-scale": "Custom Item Scale",
+  "dropped-item-tweaks.custom-item-scale.description": "Custom scale for any items you list.\n\nSet to 0 to disable!",
+  "dropped-item-tweaks.custom-item-scale-list": "Custom Item Scale List"
 }

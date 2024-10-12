@@ -1,19 +1,19 @@
 {
 	"schemaVersion": 1,
-	"id": "droppeditemtweaks",
+	"id": "${id}",
 	"version": "${version}",
-	"name": "Dropped Item Tweaks",
-	"description": "Small changes to the way dropped items render.",
+	"name": "${name}",
+	"description": "${description}",
 	"authors": [
 		"Microcontrollers"
 	],
 	"contact": {
-		"homepage": "https://modrinth.com/mod/droppeditemtweaks",
-		"sources": "https://github.com/MicrocontrollersDev/DroppedItemTweaks",
-		"issues": "https://github.com/MicrocontrollersDev/DroppedItemTweaks/issues"
+		"homepage": "${modrinth}",
+		"sources": "${source}",
+		"issues": "${issues}"
 	},
 	"license": "LGPLv3",
-	"icon": "assets/droppeditemtweaks/icon.png",
+	"icon": "assets/${id}/icon.png",
 	"environment": "client",
 	"entrypoints": {
 		"main": [
@@ -24,7 +24,7 @@
 		]
 	},
 	"mixins": [
-		"droppeditemtweaks.mixins.json"
+		"${id}.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.15",
@@ -36,8 +36,10 @@
 	"custom": {
 		"modmenu": {
 			"links": {
-				"modmenu.discord": "https://discord.gg/rejfv9kFJj",
-				"modmenu.modrinth": "https://modrinth.com/mod/droppeditemtweaks"
+				"modmenu.kofi": "${kofi}",
+				"modmenu.discord": "${discord}",
+				"modmenu.modrinth": "${modrinth}",
+				"modmenu.curseforge": "${curseforge}"
 			},
 			"update_checker": true
 		}
