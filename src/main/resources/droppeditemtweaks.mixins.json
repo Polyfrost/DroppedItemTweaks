@@ -3,7 +3,9 @@
   "package": "dev.microcontrollers.droppeditemtweaks.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "ItemEntityRendererMixin"
+    "ItemEntityRendererMixin",
+    //? if >=1.21.3
+    "ItemEntityRenderStateMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -28,7 +28,7 @@ public class DroppedItemTweaksConfig {
     @SerialEntry public int dropStackCount = 0;
     @SerialEntry public float itemScale = 1F;
     @SerialEntry public float uhcOverlay = 0F;
-    @SerialEntry public List<Item> uchItemList = new ArrayList<>(List.of(Items.APPLE, Items.GOLDEN_APPLE, Items.GOLD_INGOT, Items.GOLD_NUGGET, Items.GOLD_BLOCK, Items.PLAYER_HEAD));
+    @SerialEntry public List<Item> uchItemList = new ArrayList<>(List.of(Items.APPLE, Items.GOLDEN_APPLE, Items.ENCHANTED_GOLDEN_APPLE, Items.GOLD_INGOT, Items.GOLD_NUGGET, Items.GOLD_BLOCK, Items.PLAYER_HEAD));
 
 
     public static Screen configScreen(Screen parent) {

@@ -50,12 +50,12 @@ stonecutter.const("neoforge", loader.isNeoforge)
 loom {
 	silentMojangMappingsLicense()
 
-	runConfigs.remove(runConfigs["server"])
-
 	runConfigs.all {
 		ideConfigGenerated(stonecutter.current.isActive)
 		runDir = "../../run"
 	}
+
+	runConfigs.remove(runConfigs["server"])
 }
 
 repositories {
@@ -77,29 +77,23 @@ dependencies {
 
 		// Parchment mappings (it adds parameter mappings & javadoc)
 		optionalProp("deps.parchment_version") {
-			parchment("org.parchmentmc.data:parchment-${property("mod.mc_version")}:$it@zip")
+			if (mc.version == "1.21.3") parchment("org.parchmentmc.data:parchment-1.21:$it@zip") // TODO: remove when parchment 1.21.3
+			else parchment("org.parchmentmc.data:parchment-${property("mod.mc_version")}:$it@zip")
 		}
 	})
 
+	modRuntimeOnly("me.djtheredstoner:DevAuth-${loader.loader}:${deps.devauthVersion}")
+
 	if (loader.isFabric) {
 		modImplementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
-
-		// YACL
-		modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${mc.version}-${loader.loader}")
-
-		// Mod Menu
+		if (mc.version == "1.21.3") modImplementation("net.fabricmc.fabric-api:fabric-api:0.106.1+1.21.3") // TODO: remove when I know why this is needed lol
+		if (mc.version == "1.21.3") modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21.2-${loader.loader}") // TODO: remove when YACL 1.21.3
+		else modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${mc.version}-${loader.loader}")
 		modImplementation("com.terraformersmc:modmenu:${deps.modmenuVersion}")
-
-		// DevAuth
-		modRuntimeOnly("me.djtheredstoner:DevAuth-${loader.loader}:${deps.devauthVersion}")
 	} else if (loader.isNeoforge) {
 		"neoForge"("net.neoforged:neoforge:${findProperty("deps.neoforge")}")
-
-		// YACL
-		implementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${mc.version}-${loader.loader}") {isTransitive = false}
-
-		// DevAuth
-		modRuntimeOnly("me.djtheredstoner:DevAuth-${loader.loader}:${deps.devauthVersion}")
+		if (mc.version == "1.21.3") implementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21.2-${loader.loader}") {isTransitive = false} // TODO: remove when YACL 1.21.3
+		else implementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21.2-${loader.loader}") {isTransitive = false}
 	}
 }
 
