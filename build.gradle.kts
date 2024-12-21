@@ -18,6 +18,7 @@ class ModData {
 }
 
 class Dependencies {
+	val fabricApiVersion = property("deps.fabric_api_version")
 	val modmenuVersion = property("deps.modmenu_version")
 	val yaclVersion = property("deps.yacl_version")
 	val devauthVersion = property("deps.devauth_version")
@@ -32,7 +33,6 @@ class LoaderData {
 class McData {
 	val version = property("mod.mc_version")
 	val dep = property("mod.mc_dep")
-	val targets = property("mod.mc_targets").toString().split(", ")
 }
 
 val mc = McData()
@@ -70,6 +70,12 @@ repositories {
 dependencies {
 	minecraft("com.mojang:minecraft:${mc.version}")
 
+	val yaclMcVersion = when (mc.version) {
+		"1.21.1" -> "1.21"
+		"1.21.3" -> "1.21.2"
+		else -> mc.version
+	}
+
 	@Suppress("UnstableApiUsage")
 	mappings(loom.layered {
 		// Mojmap mappings
@@ -77,8 +83,7 @@ dependencies {
 
 		// Parchment mappings (it adds parameter mappings & javadoc)
 		optionalProp("deps.parchment_version") {
-			if (mc.version == "1.21.3") parchment("org.parchmentmc.data:parchment-1.21:$it@zip") // TODO: remove when parchment 1.21.3
-			else parchment("org.parchmentmc.data:parchment-${property("mod.mc_version")}:$it@zip")
+			parchment("org.parchmentmc.data:parchment-${property("mod.mc_version")}:$it@zip")
 		}
 	})
 
@@ -86,22 +91,20 @@ dependencies {
 
 	if (loader.isFabric) {
 		modImplementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
-		if (mc.version == "1.21.3") modImplementation("net.fabricmc.fabric-api:fabric-api:0.106.1+1.21.3") // TODO: remove when I know why this is needed lol
-		if (mc.version == "1.21.3") modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21.2-${loader.loader}") // TODO: remove when YACL 1.21.3
-		else modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${mc.version}-${loader.loader}")
+		modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${yaclMcVersion}-${loader.loader}")
 		modImplementation("com.terraformersmc:modmenu:${deps.modmenuVersion}")
+		if (deps.fabricApiVersion != "[VERSIONED]") modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApiVersion}")
 	} else if (loader.isNeoforge) {
 		"neoForge"("net.neoforged:neoforge:${findProperty("deps.neoforge")}")
-		if (mc.version == "1.21.3") implementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21.2-${loader.loader}") {isTransitive = false} // TODO: remove when YACL 1.21.3
-		else implementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21.2-${loader.loader}") {isTransitive = false}
+		implementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${yaclMcVersion}-${loader.loader}") {isTransitive = false}
 	}
 }
 
 java {
-	val java = if (stonecutter.compare(
+	val java = if (stonecutter.eval(
 			stonecutter.current.version,
-			"1.20.6"
-		) >= 0
+			">=1.20.6"
+		)
 	) JavaVersion.VERSION_21 else JavaVersion.VERSION_17
 	sourceCompatibility = java
 	targetCompatibility = java

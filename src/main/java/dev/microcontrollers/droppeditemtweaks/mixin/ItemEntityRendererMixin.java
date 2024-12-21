@@ -1,7 +1,8 @@
 package dev.microcontrollers.droppeditemtweaks.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+//? if <=1.21.3
+/*import com.llamalad7.mixinextras.injector.ModifyReturnValue;*/
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.microcontrollers.droppeditemtweaks.config.DroppedItemTweaksConfig;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -43,8 +44,10 @@ public class ItemEntityRendererMixin {
         poseStack.scale(scale, scale, scale);
     }
 
-    @ModifyReturnValue(method = /*? if >=1.20.6 {*/ "getRenderedAmount" /*?} else {*/ /*"getRenderAmount" *//*?}*/, at = @At("RETURN"))
-    private /*? if >=1.20.6 {*/ static /*?}*/ int forceStackAmount(int original, /*? if >=1.20.6 {*/ int stackSize /*?} else {*/ /*ItemStack stack *//*?}*/) {
-        return DroppedItemTweaksConfig.CONFIG.instance().dropStackCount != 0 ? Math.min(DroppedItemTweaksConfig.CONFIG.instance().dropStackCount, /*? if >=1.20.6 {*/ stackSize /*?} else {*/ /*stack.getCount() *//*?}*/) : original;
+    //? if <=1.21.3 {
+    /*@ModifyReturnValue(method = /^? if >=1.20.6 {^/ "getRenderedAmount" /^?} else {^/ /^"getRenderAmount" ^//^?}^/, at = @At("RETURN"))
+    private /^? if >=1.20.6 {^/ static /^?}^/ int forceStackAmount(int original, /^? if >=1.20.6 {^/ int stackSize /^?} else {^/ /^ItemStack stack ^//^?}^/) {
+        return DroppedItemTweaksConfig.CONFIG.instance().dropStackCount != 0 ? Math.min(DroppedItemTweaksConfig.CONFIG.instance().dropStackCount, /^? if >=1.20.6 {^/ stackSize /^?} else {^/ /^stack.getCount() ^//^?}^/) : original;
     }
+    *///?}
 }
