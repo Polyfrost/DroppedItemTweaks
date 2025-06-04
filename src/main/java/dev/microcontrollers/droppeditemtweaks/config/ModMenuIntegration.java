@@ -1,7 +1,7 @@
 package dev.microcontrollers.droppeditemtweaks.config;
 
 //? if fabric {
-/*import com.terraformersmc.modmenu.api.ConfigScreenFactory;
+import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import io.shcm.shsupercm.fabric.fletchingtable.api.Entrypoint;
 import net.fabricmc.api.EnvType;
@@ -15,4 +15,4 @@ public class ModMenuIntegration implements ModMenuApi {
         return DroppedItemTweaksConfig::configScreen;
     }
 }
-*///?}
+//?}
