@@ -5,9 +5,9 @@
   "client": [
     //? if >=1.21.4
     "ItemClusterRenderStateMixin",
-    "ItemEntityRendererMixin",
-    //? if >=1.21.3
-    "ItemEntityRenderStateMixin"
+    "ItemEntityRendererMixin"
+    //? if >= 1.21.3
+    , "ItemEntityRenderStateMixin"
   ],
   "injectors": {
     "defaultRequire": 1

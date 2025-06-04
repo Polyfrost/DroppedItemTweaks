@@ -1,4 +1,5 @@
 {
+  "modmenu.descriptionTranslation.examplemod": "${description}",
   "dropped-item-tweaks.dropped-item-tweaks": "Dropped Item Tweaks",
   "dropped-item-tweaks.static-dropped-items": "Static Dropped Items",
   "dropped-item-tweaks.static-dropped-items.description": "Remove the bobbing of items dropped on the ground.",
