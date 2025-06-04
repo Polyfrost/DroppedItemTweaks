@@ -2,6 +2,7 @@ plugins {
 	id("dev.architectury.loom") version "1.10.+"
 	id("me.modmuss50.mod-publish-plugin") version "0.8.4"
 	id("net.kyori.blossom") version "1.3.2"
+	id("io.shcm.shsupercm.fabric.fletchingtable") version "1.6"
 }
 
 class ModData {
@@ -55,6 +56,11 @@ stonecutter.allowExtensions("json")
 
 blossom {
 	replaceToken("@MODID@", mod.id)
+	replaceToken("@MODID@", mod.id, "src/main/resources/fabric.mod.json")
+}
+
+fletchingTable {
+	defaultMixinEnvironment = "auto"
 }
 
 loom {

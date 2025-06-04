@@ -12,22 +12,14 @@
 		"sources": "${source}",
 		"issues": "${issues}"
 	},
-	"license": "LGPLv3",
+	"license": "${license}",
 	"icon": "assets/${id}/icon.png",
 	"environment": "client",
-	"entrypoints": {
-		"main": [
-			"dev.microcontrollers.droppeditemtweaks.DroppedItemTweaks"
-		],
-		"modmenu": [
-			"dev.microcontrollers.droppeditemtweaks.config.ModMenuIntegration"
-		]
-	},
 	"mixins": [
 		"${id}.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.16",
+		"fabricloader": ">=0.16.10",
 		"minecraft": "${mcdep}",
 		"java": ">=17",
 		"fabric-api": "*",
