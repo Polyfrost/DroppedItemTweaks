@@ -1,52 +1,24 @@
 {
-	"schemaVersion": 1,
-	"id": "${id}",
-	"version": "${version}",
-	"name": "${name}",
-	"description": "${description}",
-	"authors": [
-		"Microcontrollers"
-	],
-	"contact": {
-		"homepage": "${modrinth}",
-		"sources": "${source}",
-		"issues": "${issues}"
-	},
-	"license": "LGPLv3",
-	"icon": "assets/${id}/icon.png",
-	"environment": "client",
-	"entrypoints": {
-		"main": [
-			"dev.microcontrollers.droppeditemtweaks.DroppedItemTweaks"
-		],
-		"modmenu": [
-			"dev.microcontrollers.droppeditemtweaks.config.ModMenuIntegration"
-		]
-	},
-	"mixins": [
-		"${id}.mixins.json"
-	],
-	"depends": {
-		"fabricloader": ">=0.16",
-		"minecraft": "${mcdep}",
-		"java": ">=17",
-		"fabric-api": "*",
-		"yet_another_config_lib_v3": "*"
-	},
-	"breaks": {
-		"feather": "*",
-		"labymod": "*",
-		"ichor": "*"
-	},
-	"custom": {
-		"modmenu": {
-			"links": {
-				"modmenu.kofi": "${kofi}",
-				"modmenu.discord": "${discord}",
-				"modmenu.modrinth": "${modrinth}",
-				"modmenu.curseforge": "${curseforge}"
-			},
-			"update_checker": true
-		}
-	}
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "authors": [
+    "Polyfrost"
+  ],
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      {
+        "value": "org.polyfrost.droppeditemtweaks.DroppedItemTweaks"
+      }
+    ]
+  },
+  "mixins": [
+    "mixins.${mod_id}.json"
+  ],
+  "depends": {
+    "minecraft": "~${minor_mc_version}",
+    "fabricloader": ">=0.15.11"
+  }
 }
