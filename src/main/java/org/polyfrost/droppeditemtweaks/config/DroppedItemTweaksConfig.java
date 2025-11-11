@@ -8,6 +8,8 @@ import org.polyfrost.oneconfig.api.config.v1.annotations.Switch;
 public class DroppedItemTweaksConfig extends Config {
     public DroppedItemTweaksConfig() {
         super(DroppedItemTweaks.ID + ".json", DroppedItemTweaks.NAME, Category.QOL);
+
+        loadFrom("patcher.toml");
     }
 
 
